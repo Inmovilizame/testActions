@@ -33,14 +33,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3.0.0 # 2022-03-01
         with:
-          ref: ${{ steps.sha.outputs.result }}
           fetch-depth: 0
 
       - name: Run changed-files with dir_names
         id: changed-files-dir-names
         uses: tj-actions/changed-files@v32
         with:
-          base_sha: ${{ github.event.pull_request.base.sha }}
+          base_sha: ${{ github.event.workflow_run.head_sha }}
           sha: ${{ steps.sha.outputs.result }}
           dir_names: "true"
 
