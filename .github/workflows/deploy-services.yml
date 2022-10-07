@@ -43,3 +43,20 @@ jobs:
           base_sha: ${{ github.event.pull_request.base.sha }}
           sha: ${{ steps.sha.outputs.result }}
           dir_names: "true"
+
+      - name: Get service
+        id: get-service
+        run: |
+          echo ${{ steps.changed-files-dir-names.outputs.all_changed_files }}
+          declare -A changes=()
+          for value in ${{ steps.changed-files-dir-names.outputs.all_changed_files }}; do
+            changes[$value]=1
+          done
+          new_array=()
+          for item in "${services[@]}"; do
+            new_array+=("$item")
+          done
+          echo "${new_array[@]}"
+          json="$(jq --compact-output --null-input '$ARGS.positional' --args -- "${new_array[@]}")"
+          echo $json
+          echo "::set-output name=json-paths::$json"
