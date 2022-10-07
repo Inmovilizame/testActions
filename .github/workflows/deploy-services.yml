@@ -49,11 +49,9 @@ jobs:
         run: |
           echo ${{ steps.changed-files-dir-names.outputs.all_changed_files }}
           declare -A changes=()
+          new_array=()
           for value in ${{ steps.changed-files-dir-names.outputs.all_changed_files }}; do
             changes[$value]=1
-          done
-          new_array=()
-          for item in "${services[@]}"; do
             new_array+=("$item")
           done
           echo "${new_array[@]}"
