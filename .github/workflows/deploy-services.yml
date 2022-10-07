@@ -48,11 +48,9 @@ jobs:
         id: get-service
         run: |
           echo ${{ steps.changed-files-dir-names.outputs.all_changed_files }}
-          declare -A changes=()
           new_array=()
           for value in ${{ steps.changed-files-dir-names.outputs.all_changed_files }}; do
-            changes[$value]=1
-            new_array+=("$item")
+            new_array+=("$value")
           done
           echo "${new_array[@]}"
           json="$(jq --compact-output --null-input '$ARGS.positional' --args -- "${new_array[@]}")"
