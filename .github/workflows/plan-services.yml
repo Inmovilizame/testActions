@@ -1,0 +1,27 @@
+name: Plan step
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  extract-paths:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write
+    outputs:
+      services-list: ${{ steps.get-service.outputs.json-paths }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.0.0 # 2022-03-01
+        with:
+          fetch-depth: 0
+
+      - name: Run changed-files with dir_names
+        id: changed-files-dir-names
+        uses: tj-actions/changed-files@v32
+        with:
+          base_sha: ${{ github.event.pull_request.base.sha }}
+          dir_names: "true"

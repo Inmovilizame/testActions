@@ -1,0 +1,45 @@
+name: Deploy
+
+on:
+  issue_comment:
+    types:
+      - created
+
+jobs:
+  extract-paths:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.issue.pull_request && github.event.comment.body == '/deploy' }}
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write
+    outputs:
+      services-list: ${{ steps.get-service.outputs.json-paths }}
+    steps:
+      - name: Get PR SHA
+        id: sha
+        uses: actions/github-script@v6.0.0 # 2022-02-11
+        with:
+          result-encoding: string
+          script: |
+            const { owner, repo, number } = context.issue;
+            const pr = await github.rest.pulls.get({
+              owner,
+              repo,
+              pull_number: number,
+            });
+            return pr.data.head.sha
+
+      - name: Checkout
+        uses: actions/checkout@v3.0.0 # 2022-03-01
+        with:
+          ref: ${{ steps.sha.outputs.result }}
+          fetch-depth: 0
+
+      - name: Run changed-files with dir_names
+        id: changed-files-dir-names
+        uses: tj-actions/changed-files@v32
+        with:
+          base_sha: ${{ github.event.pull_request.base.sha }}
+          sha: ${{ steps.sha.outputs.result }}
+          dir_names: "true"
